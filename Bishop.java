@@ -1,5 +1,5 @@
 public class Bishop extends Figure{
-    Bishop(boolean isWhite, boolean isBlack){
-        super(isWhite, isBlack);
+    Bishop(boolean isWhite, boolean isBlack, Square position){
+        super(isWhite, isBlack, position);
     }
 }

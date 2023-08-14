@@ -1,15 +1,15 @@
 import java.util.List;
 
 public class Pawn extends Figure{
-    public Pawn(boolean isWhite, boolean isBlack){
-        super(isWhite, isBlack);
+    public Pawn(boolean isWhite, boolean isBlack, Square position){
+        super(isWhite, isBlack, position);
     }
 
-    public List<Square> canMoveTo(){
+    public List<Position> canMoveTo(){
         return null;
     }
 
-    public List<Square> canSee(){
+    public List<Position> canSee(){
         return null;
     }
 }
