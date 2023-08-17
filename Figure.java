@@ -2,11 +2,10 @@ public class Figure {
     private boolean isWhite = false;
     private boolean isBlack = false;
 
-    private Square position;
+    private Position position;
     //private char possibleLetter;
     //private int possibleNumber;
     //private Map<char, Integer> possiblePosition = new HashMap<>();
-    private Position possiblePosition;
 
     public boolean isWhite() {
         return isWhite;
@@ -24,23 +23,15 @@ public class Figure {
         isBlack = black;
     }
 
-    public Square getPosition() {
+    public Position getPosition() {
         return position;
     }
 
-    public void setPosition(Square position) {
+    public void setPosition(Position position) {
         this.position = position;
     }
 
-    public Position getPossiblePosition() {
-        return possiblePosition;
-    }
-
-    public void setPossiblePosition(Position possiblePosition) {
-        this.possiblePosition = possiblePosition;
-    }
-
-    public Figure(boolean isWhite, boolean isBlack, Square position){
+    public Figure(boolean isWhite, boolean isBlack, Position position){
         this.isWhite = isWhite;
         this.isBlack = isBlack;
         this.position = position;

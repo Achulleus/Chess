@@ -22,4 +22,18 @@ public class Position {
         this.letter = letter;
         this.number = number;
     }
+
+    public char getLetterBefor(){
+        int z = (int) getLetter();
+        z = z -1;
+        char res = (char) z;
+        return res;
+    }
+
+    public char getLetterAfter(){
+        int z = (int) getLetter();
+        z++;
+        char res = (char) z;
+        return res;
+    }
 }
