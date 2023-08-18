@@ -30,9 +30,23 @@ public class Position {
         return res;
     }
 
+    public char getLetterBefor(int i){
+        int z = (int) getLetter();
+        z = z - i;
+        char res = (char) z;
+        return res;
+    }
+
     public char getLetterAfter(){
         int z = (int) getLetter();
         z++;
+        char res = (char) z;
+        return res;
+    }
+
+    public char getLetterAfter(int i){
+        int z = (int) getLetter();
+        z = z + i;
         char res = (char) z;
         return res;
     }

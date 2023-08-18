@@ -8,9 +8,28 @@ public class Bishop extends Figure{
 
     public List<Position> canMoveTo(){
         List<Position> res = new ArrayList<>();
-        int z = 0;
-        for(int i = 0;i<8;i++){
+        int z = 1;
+        for(int i = 1;i<=8;i++){
+            res.add(new Position(getPosition().getLetterAfter(i), getPosition().getNumber() + z));
+            z++;
+        }
+        z = 1;
 
+        for(int i = 1;i<=8;i++){
+            res.add(new Position(getPosition().getLetterAfter(i), getPosition().getNumber() - z));
+            z++;
+        }
+        z = 1;
+
+        for(int i = 1;i<=8;i++){
+            res.add(new Position(getPosition().getLetterBefor(i), getPosition().getNumber() - z));
+            z++;
+        }
+        z = 1;
+
+        for(int i = 1;i<=8;i++){
+            res.add(new Position(getPosition().getLetterBefor(i), getPosition().getNumber() + z));
+            z++;
         }
         return res;
     }
