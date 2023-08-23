@@ -4,6 +4,7 @@ import java.util.List;
 public class Bishop extends Figure{
     Bishop(boolean isWhite, boolean isBlack, Position position){
         super(isWhite, isBlack, position);
+        setType("Bishop");
     }
 
     public List<Position> canMoveTo(){

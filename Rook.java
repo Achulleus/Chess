@@ -4,6 +4,7 @@ import java.util.List;
 public class Rook extends Figure{
     public Rook(boolean isWhite, boolean isBlack, Position position){
         super(isWhite, isBlack, position);
+        setType("Rook");
     }
 
     public List<Position> canMoveTo(){

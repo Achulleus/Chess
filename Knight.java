@@ -4,6 +4,7 @@ import java.util.List;
 public class Knight extends Figure{
     public Knight(boolean isWhite, boolean isBlack, Position position){
         super(isWhite, isBlack, position);
+        setType("Knight");
     }
 
     public List<Position> canMoveTo(){

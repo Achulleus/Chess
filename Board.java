@@ -8,6 +8,8 @@ public class Board {
     public static int numbers = 8;
     private Map<Character, List<Square>> board = new HashMap<>();
     private List<Figure> capturedFigures = new ArrayList<>();
+    private List<Figure> livingFiguresBlack = new ArrayList<>();
+    private List<Figure> livingFiguresWhite = new ArrayList<>();
     //private Square[][] board = new Square[8][8];
 
     public Board(){
@@ -55,6 +57,40 @@ public class Board {
         Queen blackQueen = new Queen(false,true,new Position('D',numbers));
         King blackKing = new King(false,true,new Position('E',numbers));
 
+        livingFiguresWhite.add(whiteAPawn);
+        livingFiguresWhite.add(whiteBPawn);
+        livingFiguresWhite.add(whiteCPawn);
+        livingFiguresWhite.add(whiteDPawn);
+        livingFiguresWhite.add(whiteEPawn);
+        livingFiguresWhite.add(whiteFPawn);
+        livingFiguresWhite.add(whiteGPawn);
+        livingFiguresWhite.add(whiteHPawn);
+        livingFiguresWhite.add(whiteARook);
+        livingFiguresWhite.add(whiteBKnight);
+        livingFiguresWhite.add(whiteCBishop);
+        livingFiguresWhite.add(whiteQueen);
+        livingFiguresWhite.add(whiteKing);
+        livingFiguresWhite.add(whiteFBishop);
+        livingFiguresWhite.add(whiteGKnight);
+        livingFiguresWhite.add(whiteHRook);
+
+        livingFiguresBlack.add(blackAPawn);
+        livingFiguresBlack.add(blackBPawn);
+        livingFiguresBlack.add(blackCPawn);
+        livingFiguresBlack.add(blackDPawn);
+        livingFiguresBlack.add(blackEPawn);
+        livingFiguresBlack.add(blackFPawn);
+        livingFiguresBlack.add(blackGPawn);
+        livingFiguresBlack.add(blackHPawn);
+        livingFiguresBlack.add(blackARook);
+        livingFiguresBlack.add(blackBKnight);
+        livingFiguresBlack.add(blackCBishop);
+        livingFiguresBlack.add(blackQueen);
+        livingFiguresBlack.add(blackKing);
+        livingFiguresBlack.add(blackFBishop);
+        livingFiguresBlack.add(blackGKnight);
+        livingFiguresBlack.add(blackHRook);
+
         //Set figures to there starting position
         board.get(whiteAPawn.getPosition().getLetter()).get(whiteAPawn.getPosition().getNumber()-1).setOccupiedFigure(whiteAPawn);
         board.get(whiteBPawn.getPosition().getLetter()).get(whiteBPawn.getPosition().getNumber()-1).setOccupiedFigure(whiteBPawn);
@@ -99,6 +135,11 @@ public class Board {
         if(validateMove(figure,newPosition) == true){
             if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure() != null){
                 capturedFigures.add(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
+                if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isWhite() == true){
+                    livingFiguresWhite.remove(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
+                }else{
+                    livingFiguresBlack.remove(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
+                }
             }
             board.get(figure.getPosition().getLetter()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
             figure.setPosition(newPosition);
@@ -107,8 +148,50 @@ public class Board {
     }
 
     public boolean validateMove(Figure figure, Position newPosition){
-        boolean isValid = false;
-        //TODO
+        boolean isValid = true;
+        boolean isInLetters = false;
+        boolean figureCanSeePosition = false;
+        Position oldPosition = figure.getPosition();
+
+        if(newPosition.getNumber() <= 0 || newPosition.getNumber() >= numbers) isValid = false;
+        for(int i = 0; i < letters.length(); i++){
+            if(letters.charAt(i) == newPosition.getLetter()) isInLetters = true;
+        }
+        if(isInLetters = false) isValid = false;
+
+        if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isWhite() && figure.isWhite()) isValid = false;
+        if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isBlack() && figure.isBlack()) isValid = false;
+        if(figure.getType().equalsIgnoreCase("Pawn")){
+            if(figure.canMoveTo().contains(newPosition)) figureCanSeePosition = true;
+            if(pawnCanSee(figure).contains(newPosition)) figureCanSeePosition = true;
+        }else {
+            if(figure.canMoveTo().contains(newPosition)) figureCanSeePosition = true;
+        }
+        if(figureCanSeePosition = false) isValid = false;
+
+        //TODO: Figur zwischen oldPosition und newPosition
+        //TODO: Check aktuell?
+        //TODO: Check nach dem Zug? board in lokale Variable kopieren -> Zug durchfuehren -> auf Check überpruefen
         return isValid;
+    }
+
+    public List<Position> pawnCanSee(Figure figure){
+        List<Position> res = new ArrayList<>();
+        if(figure.isWhite()==true) {
+            if(figure.getPosition().getNumber() < numbers) {
+                if (board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()).getOccupiedFigure().isBlack())
+                    res.add(new Position(figure.getPosition().getLetterBefor(), figure.getPosition().getNumber() + 1));
+                if (board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()).getOccupiedFigure().isBlack())
+                    res.add(new Position(figure.getPosition().getLetterAfter(), figure.getPosition().getNumber() + 1));
+            }
+        }else{
+            if(figure.getPosition().getNumber() >= 2) {
+                if (board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber() - 2).getOccupiedFigure().isWhite())
+                    res.add(new Position(figure.getPosition().getLetterBefor(), figure.getPosition().getNumber() - 1));
+                if (board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber() - 2).getOccupiedFigure().isWhite())
+                    res.add(new Position(figure.getPosition().getLetterAfter(), figure.getPosition().getNumber() - 1));
+            }
+        }
+        return res;
     }
 }

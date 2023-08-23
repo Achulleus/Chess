@@ -4,6 +4,7 @@ import java.util.List;
 public class Pawn extends Figure{
     public Pawn(boolean isWhite, boolean isBlack, Position position){
         super(isWhite, isBlack, position);
+        setType("Pawn");
     }
 
     public List<Position> canMoveTo(){
@@ -22,18 +23,6 @@ public class Pawn extends Figure{
             }else{
                 res.add(new Position(getPosition().getLetter(), getPosition().getNumber()-1));
             }
-        }
-        return res;
-    }
-
-    public List<Position> canSee(){
-        List<Position> res = new ArrayList<>();
-        if(isWhite()==true) {
-            res.add(new Position(getPosition().getLetterBefor(), getPosition().getNumber() + 1));
-            res.add(new Position(getPosition().getLetterAfter(), getPosition().getNumber() + 1));
-        }else{
-            res.add(new Position(getPosition().getLetterBefor(), getPosition().getNumber() - 1));
-            res.add(new Position(getPosition().getLetterAfter(), getPosition().getNumber() - 1));
         }
         return res;
     }

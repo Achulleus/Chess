@@ -1,11 +1,18 @@
-public class Figure {
+import java.util.List;
+
+public abstract class Figure {
     private boolean isWhite = false;
     private boolean isBlack = false;
-
+    private  String type;
     private Position position;
-    //private char possibleLetter;
-    //private int possibleNumber;
-    //private Map<char, Integer> possiblePosition = new HashMap<>();
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public boolean isWhite() {
         return isWhite;
@@ -36,4 +43,6 @@ public class Figure {
         this.isBlack = isBlack;
         this.position = position;
     }
+
+    public abstract List<Position> canMoveTo();
 }
