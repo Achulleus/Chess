@@ -8,19 +8,19 @@ public class Rook extends Figure{
 
     public List<Position> canMoveTo(){
         List<Position> res = new ArrayList<>();
-        for(int i = 1;i<=8;i++){
+        for(int i = 1;i<=Board.letters.length();i++){
             res.add(new Position(getPosition().getLetterAfter(i), getPosition().getNumber()));
         }
 
-        for(int i = 1;i<=8;i++){
-            res.add(new Position(getPosition().getLetter(), getPosition().getNumber() - 1));
+        for(int i = 1;i<=Board.numbers;i++){
+            res.add(new Position(getPosition().getLetter(), getPosition().getNumber() - i));
         }
 
-        for(int i = 1;i<=8;i++){
+        for(int i = 1;i<=Board.letters.length();i++){
             res.add(new Position(getPosition().getLetterBefor(i), getPosition().getNumber()));
         }
 
-        for(int i = 1;i<=8;i++){
+        for(int i = 1;i<=Board.numbers;i++){
             res.add(new Position(getPosition().getLetter(), getPosition().getNumber() + i));
         }
         return res;

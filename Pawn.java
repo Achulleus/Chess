@@ -16,9 +16,9 @@ public class Pawn extends Figure{
                 res.add(new Position(getPosition().getLetter(), getPosition().getNumber()+1));
             }
         }else{
-            if(getPosition().getNumber() == 7){
-                res.add(new Position(getPosition().getLetter(), 6));
-                res.add(new Position(getPosition().getLetter(), 5));
+            if(getPosition().getNumber() == Board.numbers - 1){
+                res.add(new Position(getPosition().getLetter(), Board.numbers - 2));
+                res.add(new Position(getPosition().getLetter(), Board.numbers - 3));
             }else{
                 res.add(new Position(getPosition().getLetter(), getPosition().getNumber()-1));
             }
@@ -28,8 +28,13 @@ public class Pawn extends Figure{
 
     public List<Position> canSee(){
         List<Position> res = new ArrayList<>();
-        res.add(new Position(getPosition().getLetterBefor(), getPosition().getNumber() + 1));
-        res.add(new Position(getPosition().getLetterAfter(), getPosition().getNumber() + 1));
+        if(isWhite()==true) {
+            res.add(new Position(getPosition().getLetterBefor(), getPosition().getNumber() + 1));
+            res.add(new Position(getPosition().getLetterAfter(), getPosition().getNumber() + 1));
+        }else{
+            res.add(new Position(getPosition().getLetterBefor(), getPosition().getNumber() - 1));
+            res.add(new Position(getPosition().getLetterAfter(), getPosition().getNumber() - 1));
+        }
         return res;
     }
 }
