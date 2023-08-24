@@ -149,15 +149,8 @@ public class Board {
 
     public boolean validateMove(Figure figure, Position newPosition){
         boolean isValid = true;
-        boolean isInLetters = false;
         boolean figureCanSeePosition = false;
         Position oldPosition = figure.getPosition();
-
-        if(newPosition.getNumber() <= 0 || newPosition.getNumber() >= numbers) isValid = false;
-        for(int i = 0; i < letters.length(); i++){
-            if(letters.charAt(i) == newPosition.getLetter()) isInLetters = true;
-        }
-        if(isInLetters = false) isValid = false;
 
         if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isWhite() && figure.isWhite()) isValid = false;
         if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isBlack() && figure.isBlack()) isValid = false;
@@ -169,7 +162,6 @@ public class Board {
         }
         if(figureCanSeePosition = false) isValid = false;
 
-        //TODO: Figur zwischen oldPosition und newPosition
         //TODO: Check aktuell?
         //TODO: Check nach dem Zug? board in lokale Variable kopieren -> Zug durchfuehren -> auf Check überpruefen
         return isValid;
@@ -195,8 +187,5 @@ public class Board {
         return res;
     }
 
-    public List<Position> validateFigurePositions(Figure figure){
-        List<Position> res = new ArrayList<>();
-        return res;
-    }
+    //TODO: Add special moves (Onbusont, Chastle, Transformation of the pawn at the last rank)
 }
