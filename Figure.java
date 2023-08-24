@@ -1,8 +1,9 @@
 import java.util.List;
+import java.util.Map;
 
 public abstract class Figure {
-    private boolean isWhite = false;
-    private boolean isBlack = false;
+    private boolean isWhite;
+    private boolean isBlack;
     private  String type;
     private Position position;
 
@@ -44,5 +45,31 @@ public abstract class Figure {
         this.position = position;
     }
 
-    public abstract List<Position> canMoveTo();
+    public abstract List<Position> canMoveTo(Map<Character, List<Square>> board);
+
+    public boolean validateLetter(char c){
+        boolean validateChar = false;
+        for(int i = 0; i < Board.letters.length(); i++){
+            if(Board.letters.charAt(i) == c) validateChar = true;
+        }
+        return validateChar;
+    }
+
+    public boolean validatePosition(Map<Character, List<Square>> board, Position investigatedPosition, boolean isWhite){
+        boolean isValidPosition = false;
+        Square investigatedSquare;
+
+        if(validateLetter(investigatedPosition.getLetter()) && investigatedPosition.getNumber() > 0 && investigatedPosition.getNumber() <= Board.numbers) {
+            investigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
+            if(investigatedSquare.getOccupiedFigure() == null){
+                isValidPosition = true;
+            } else if (investigatedSquare.getOccupiedFigure().isWhite() && isWhite == false) {
+                isValidPosition = true;
+            } else if (investigatedSquare.getOccupiedFigure().isBlack() && isWhite) {
+                isValidPosition = true;
+            }
+        }
+
+        return isValidPosition;
+    }
 }

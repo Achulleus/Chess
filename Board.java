@@ -162,10 +162,10 @@ public class Board {
         if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isWhite() && figure.isWhite()) isValid = false;
         if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isBlack() && figure.isBlack()) isValid = false;
         if(figure.getType().equalsIgnoreCase("Pawn")){
-            if(figure.canMoveTo().contains(newPosition)) figureCanSeePosition = true;
+            if(figure.canMoveTo(board).contains(newPosition)) figureCanSeePosition = true;
             if(pawnCanSee(figure).contains(newPosition)) figureCanSeePosition = true;
         }else {
-            if(figure.canMoveTo().contains(newPosition)) figureCanSeePosition = true;
+            if(figure.canMoveTo(board).contains(newPosition)) figureCanSeePosition = true;
         }
         if(figureCanSeePosition = false) isValid = false;
 
@@ -192,6 +192,11 @@ public class Board {
                     res.add(new Position(figure.getPosition().getLetterAfter(), figure.getPosition().getNumber() - 1));
             }
         }
+        return res;
+    }
+
+    public List<Position> validateFigurePositions(Figure figure){
+        List<Position> res = new ArrayList<>();
         return res;
     }
 }
