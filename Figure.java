@@ -6,6 +6,7 @@ public abstract class Figure {
     private boolean isBlack;
     private  String type;
     private Position position;
+    private boolean hadMoved = false;
 
     public String getType() {
         return type;
@@ -37,6 +38,14 @@ public abstract class Figure {
 
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    public boolean isHadMoved() {
+        return hadMoved;
+    }
+
+    public void setHadMoved(boolean hadMoved) {
+        this.hadMoved = hadMoved;
     }
 
     public Figure(boolean isWhite, boolean isBlack, Position position){

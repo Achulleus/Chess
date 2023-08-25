@@ -18,32 +18,28 @@ public class Queen extends Figure{
             investigatedPosition = new Position(getPosition().getLetterAfter(i), getPosition().getNumber());
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
         }
 
         for(int i = 1;i<=Board.numbers;i++){
             investigatedPosition = new Position(getPosition().getLetter(), getPosition().getNumber() - i);
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
         }
 
         for(int i = 1;i<=Board.letters.length();i++){
             investigatedPosition = new Position(getPosition().getLetterBefor(i), getPosition().getNumber());
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
         }
 
         for(int i = 1;i<=Board.numbers;i++){
             investigatedPosition = new Position(getPosition().getLetter(), getPosition().getNumber() + i);
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
         }
 
         int z = 1;
@@ -51,8 +47,7 @@ public class Queen extends Figure{
             investigatedPosition = new Position(getPosition().getLetterAfter(i), getPosition().getNumber() + z);
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
             z++;
         }
         z = 1;
@@ -61,8 +56,7 @@ public class Queen extends Figure{
             investigatedPosition = new Position(getPosition().getLetterAfter(i), getPosition().getNumber() - z);
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
             z++;
         }
         z = 1;
@@ -71,8 +65,7 @@ public class Queen extends Figure{
             investigatedPosition = new Position(getPosition().getLetterBefor(i), getPosition().getNumber() - z);
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
             z++;
         }
         z = 1;
@@ -81,8 +74,7 @@ public class Queen extends Figure{
             investigatedPosition = new Position(getPosition().getLetterBefor(i), getPosition().getNumber() + z);
             if(validatePosition(board,investigatedPosition , isWhite())) res.add(investigatedPosition);
             invertigatedSquare = board.get(investigatedPosition.getLetter()).get(investigatedPosition.getNumber()-1);
-            if(invertigatedSquare.getOccupiedFigure().isWhite() && isBlack()) break;
-            if(invertigatedSquare.getOccupiedFigure().isBlack() && isWhite()) break;
+            if(invertigatedSquare.getOccupiedFigure() != null) break;
             z++;
         }
 

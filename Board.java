@@ -10,10 +10,43 @@ public class Board {
     private List<Figure> capturedFigures = new ArrayList<>();
     private List<Figure> livingFiguresBlack = new ArrayList<>();
     private List<Figure> livingFiguresWhite = new ArrayList<>();
-    //private Square[][] board = new Square[8][8];
+    private boolean isCheckmate = false;
+    private boolean isPatt = false;
+
+    public boolean isCheckmate() {
+        return isCheckmate;
+    }
+
+    public void setCheckmate(boolean checkmate) {
+        isCheckmate = checkmate;
+    }
+
+    public boolean isPatt() {
+        return isPatt;
+    }
+
+    public void setPatt(boolean patt) {
+        isPatt = patt;
+    }
+
+    public Map<Character, List<Square>> getBoard() {
+        return board;
+    }
+
+    public List<Figure> getCapturedFigures() {
+        return capturedFigures;
+    }
+
+    public List<Figure> getLivingFiguresBlack() {
+        return livingFiguresBlack;
+    }
+
+    public List<Figure> getLivingFiguresWhite() {
+        return livingFiguresWhite;
+    }
 
     public Board(){
-        //TODO
+        createNewChessboard();
     }
 
     public Map<Character, List<Square>> createNewChessboard(){
@@ -143,6 +176,7 @@ public class Board {
             }
             board.get(figure.getPosition().getLetter()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
             figure.setPosition(newPosition);
+            figure.setHadMoved(true);
             board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).setOccupiedFigure(figure);
         }
     }
@@ -150,7 +184,15 @@ public class Board {
     public boolean validateMove(Figure figure, Position newPosition){
         boolean isValid = true;
         boolean figureCanSeePosition = false;
-        Position oldPosition = figure.getPosition();
+        Map<Character, List<Square>> boardAfterMove = board;
+        Position kingsPosition;
+        Figure figureAfterMove = figure;
+
+        if(figure.getType().equalsIgnoreCase("King")) {
+            kingsPosition = figure.getPosition();
+        }else{
+            kingsPosition = getKingsPosition(figure.isWhite());
+        }
 
         if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isWhite() && figure.isWhite()) isValid = false;
         if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isBlack() && figure.isBlack()) isValid = false;
@@ -159,11 +201,24 @@ public class Board {
             if(pawnCanSee(figure).contains(newPosition)) figureCanSeePosition = true;
         }else {
             if(figure.canMoveTo(board).contains(newPosition)) figureCanSeePosition = true;
-        }
+        } //TODO: Add spezial moves
         if(figureCanSeePosition = false) isValid = false;
 
-        //TODO: Check aktuell?
-        //TODO: Check nach dem Zug? board in lokale Variable kopieren -> Zug durchfuehren -> auf Check überpruefen
+        if(isValid == true){
+            if(isCheck(board,figure.isWhite(),kingsPosition)) {
+                isCheckmate = isCheckmate(figure.isWhite(), kingsPosition);
+                if(isCheckmate) return false;
+            }else{
+                isPatt = isPatt(figure.isWhite(),kingsPosition);
+                if(isPatt) return false;
+            }
+            boardAfterMove.get(figure.getPosition().getLetter()).get(figure.getPosition().getNumber() - 1).setOccupiedFigure(null);
+            figureAfterMove.setPosition(newPosition);
+            boardAfterMove.get(newPosition.getLetter()).get(newPosition.getNumber() - 1).setOccupiedFigure(figureAfterMove);
+            if(figure.getType().equalsIgnoreCase("King")) kingsPosition = newPosition;
+            if(isCheck(boardAfterMove, figure.isWhite(), kingsPosition)) isValid = false;
+        }
+
         return isValid;
     }
 
@@ -187,5 +242,65 @@ public class Board {
         return res;
     }
 
-    //TODO: Add special moves (Onbusont, Chastle, Transformation of the pawn at the last rank)
+    public boolean isCheck(Map<Character, List<Square>> board, boolean isWhite, Position kingsPosition){
+        boolean isCheck = false;
+        List<Position> res = new ArrayList<>();
+
+        if(isWhite){
+            for(int i = 0; i < livingFiguresBlack.size(); i++){
+                res = livingFiguresBlack.get(i).canMoveTo(board);
+                if(res.contains(kingsPosition)) isCheck = true;
+            }
+        }else{
+            for(int i = 0; i < livingFiguresWhite.size(); i++){
+                res = livingFiguresWhite.get(i).canMoveTo(board);
+                if(res.contains(kingsPosition)) isCheck = true;
+            }
+        }
+
+        return isCheck;
+    }
+
+    public Position getKingsPosition(boolean isWhite){
+        Position kingsPosition = null;
+
+        if (isWhite == true) {
+            for(int i = 0; i < livingFiguresWhite.size(); i++){
+                if(livingFiguresWhite.get(i).getType().equalsIgnoreCase("King")) kingsPosition = livingFiguresWhite.get(i).getPosition();
+            }
+        } else {
+            for(int i = 0; i < livingFiguresBlack.size(); i++){
+                if(livingFiguresBlack.get(i).getType().equalsIgnoreCase("King")) kingsPosition = livingFiguresBlack.get(i).getPosition();
+            }
+        }
+
+        return kingsPosition;
+    }
+
+    public boolean isCheckmate(boolean isWhite, Position kingsPosition){
+        boolean isCheckmate = true;
+        Figure king = board.get(kingsPosition.getLetter()).get(kingsPosition.getNumber()-1).getOccupiedFigure();
+        List<Position> res = king.canMoveTo(board);
+        for(int i = 0; i < res.size(); i++){
+            kingsPosition = res.get(i);
+            if(isCheck(board, isWhite, kingsPosition) == false) isCheckmate = false;
+        }
+        return isCheckmate;
+    }
+
+    public boolean isPatt(boolean isWhite, Position kingsPosition){
+        boolean isPatt = true;
+        Figure king = board.get(kingsPosition.getLetter()).get(kingsPosition.getNumber()-1).getOccupiedFigure();
+        List<Position> res = king.canMoveTo(board);
+        if(isCheck(board, isWhite, kingsPosition)) isPatt = false;
+        if(isPatt == true) {
+            for (int i = 0; i < res.size(); i++) {
+                kingsPosition = res.get(i);
+                if (isCheck(board, isWhite, kingsPosition) == false) isPatt = false;
+            }
+        }
+        return isPatt;
+    }
+
+    //TODO: Add special moves (Onpusont, Chastle, Transformation of the pawn at the last rank)
 }
