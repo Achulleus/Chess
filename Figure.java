@@ -7,6 +7,25 @@ public abstract class Figure {
     private  String type;
     private Position position;
     private boolean hadMoved = false;
+    public boolean hadMovedtwice = false;
+
+    public boolean canEnPassant = false;
+
+    public boolean isCanEnPassant() {
+        return canEnPassant;
+    }
+
+    public void setCanEnPassant(boolean canEnPassant) {
+        this.canEnPassant = canEnPassant;
+    }
+
+    public boolean isHadMovedtwice() {
+        return hadMovedtwice;
+    }
+
+    public void setHadMovedtwice(boolean hadMovedtwice) {
+        this.hadMovedtwice = hadMovedtwice;
+    }
 
     public String getType() {
         return type;

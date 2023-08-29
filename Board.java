@@ -11,7 +11,8 @@ public class Board {
     private List<Figure> livingFiguresBlack = new ArrayList<>();
     private List<Figure> livingFiguresWhite = new ArrayList<>();
     private boolean isCheckmate = false;
-    private boolean isPatt = false;
+    private boolean isStalemate = false;
+    private char[] figureTypes = new char[4];
 
     public boolean isCheckmate() {
         return isCheckmate;
@@ -21,12 +22,12 @@ public class Board {
         isCheckmate = checkmate;
     }
 
-    public boolean isPatt() {
-        return isPatt;
+    public boolean isStalemate() {
+        return isStalemate;
     }
 
-    public void setPatt(boolean patt) {
-        isPatt = patt;
+    public void setStalemate(boolean stalemate) {
+        isStalemate = stalemate;
     }
 
     public Map<Character, List<Square>> getBoard() {
@@ -48,7 +49,11 @@ public class Board {
     public Board(){
         createNewChessboard();
         isCheckmate = false;
-        isPatt = false;
+        isStalemate = false;
+        figureTypes[0] = 'Q';
+        figureTypes[1] = 'K';
+        figureTypes[2] = 'B';
+        figureTypes[3] = 'R';
     }
 
     public Map<Character, List<Square>> createNewChessboard(){
@@ -177,6 +182,7 @@ public class Board {
         }
         board.get(figure.getPosition().getLetter()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
         figure.setPosition(newPosition);
+        if(figure.isHadMoved()) figure.setHadMovedtwice(true);
         figure.setHadMoved(true);
         board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).setOccupiedFigure(figure);
     }
@@ -187,9 +193,6 @@ public class Board {
         Map<Character, List<Square>> boardAfterMove = board;
         Position kingsPosition;
         Figure figureAfterMove = figure;
-
-        //TODO: Add spezial moves
-        if(isChastle(figure, newPosition)) return true;
 
         if(figure.getType().equalsIgnoreCase("King")) {
             kingsPosition = figure.getPosition();
@@ -212,8 +215,8 @@ public class Board {
                 isCheckmate = isCheckmate(figure.isWhite(), kingsPosition);
                 if(isCheckmate) return false;
             }else{
-                isPatt = isPatt(figure.isWhite(),kingsPosition);
-                if(isPatt) return false;
+                isStalemate = isStalemate(figure.isWhite(),kingsPosition);
+                if(isStalemate) return false;
             }
             boardAfterMove.get(figure.getPosition().getLetter()).get(figure.getPosition().getNumber() - 1).setOccupiedFigure(null);
             figureAfterMove.setPosition(newPosition);
@@ -222,6 +225,11 @@ public class Board {
             if(isCheck(boardAfterMove, figure.isWhite(), kingsPosition)) isValid = false;
         }
 
+        if(isEnPassant(figure, newPosition)) return true;
+        if(figureCanSeePosition && figure.getType().equalsIgnoreCase("Pawn")){
+            if(isPawnPromotion(figure, newPosition)) return true;
+        }
+        if(isChastle(figure, newPosition)) return true;
         if(isValid == true) makeMove(figure, newPosition);
         return isValid;
     }
@@ -292,22 +300,22 @@ public class Board {
         return isCheckmate;
     }
 
-    public boolean isPatt(boolean isWhite, Position kingsPosition){
-        boolean isPatt = true;
+    public boolean isStalemate(boolean isWhite, Position kingsPosition){
+        boolean isStalemate = true;
         Figure king = board.get(kingsPosition.getLetter()).get(kingsPosition.getNumber()-1).getOccupiedFigure();
         List<Position> res = king.canMoveTo(board);
-        if(isCheck(board, isWhite, kingsPosition)) isPatt = false;
-        if(isPatt == true) {
+        if(isCheck(board, isWhite, kingsPosition)) isStalemate = false;
+        if(isStalemate == true) {
             for (int i = 0; i < res.size(); i++) {
                 kingsPosition = res.get(i);
-                if (isCheck(board, isWhite, kingsPosition) == false) isPatt = false;
+                if (isCheck(board, isWhite, kingsPosition) == false) isStalemate = false;
             }
         }
-        return isPatt;
+        return isStalemate;
     }
 
     public boolean isChastle(Figure figure, Position newPosition){
-        boolean canChastle = false;
+        boolean isChastle = false;
 
         if(figure.getType().equalsIgnoreCase("King") && figure.isHadMoved() == false){
             if(figure.isWhite() && newPosition.getNumber() == 1 && newPosition.getLetter() == 'G' && board.get(letters.charAt(letters.length()-1)).get(0).getOccupiedFigure().isHadMoved() == false){
@@ -315,7 +323,7 @@ public class Board {
                     if (isCheck(board, true, figure.getPosition()) == false && isCheck(board, true, new Position('F', 1)) == false && isCheck(board, true, new Position('G', 1)) == false) {
                         makeMove(figure, newPosition);
                         makeMove(board.get('H').get(0).getOccupiedFigure(), new Position('F', 1));
-                        canChastle = true;
+                        isChastle = true;
                     }
                 }
             } else if (figure.isWhite() && newPosition.getNumber() == 1 && newPosition.getLetter() == 'C' && board.get('A').get(0).getOccupiedFigure().isHadMoved() == false) {
@@ -323,7 +331,7 @@ public class Board {
                     if (isCheck(board, true, figure.getPosition()) == false && isCheck(board, true, new Position('D', 1)) == false && isCheck(board, true, new Position('C', 1)) == false) {
                         makeMove(figure, newPosition);
                         makeMove(board.get('A').get(0).getOccupiedFigure(), new Position('D', 1));
-                        canChastle = true;
+                        isChastle = true;
                     }
                 }
             } else if (figure.isBlack() && newPosition.getNumber() == numbers && newPosition.getLetter() == 'G' && board.get(letters.charAt(letters.length()-1)).get(numbers-1).getOccupiedFigure().isHadMoved() == false) {
@@ -331,7 +339,7 @@ public class Board {
                     if (isCheck(board, false, figure.getPosition()) == false && isCheck(board, false, new Position('F', numbers)) == false && isCheck(board, false, new Position('G', numbers)) == false) {
                         makeMove(figure, newPosition);
                         makeMove(board.get('H').get(numbers-1).getOccupiedFigure(), new Position('F', numbers));
-                        canChastle = true;
+                        isChastle = true;
                     }
                 }
             } else if (figure.isBlack() && newPosition.getNumber() == numbers && newPosition.getLetter() == 'C' && board.get('A').get(numbers-1).getOccupiedFigure().isHadMoved() == false) {
@@ -339,14 +347,118 @@ public class Board {
                     if (isCheck(board, false, figure.getPosition()) == false && isCheck(board, false, new Position('D', numbers)) == false && isCheck(board, false, new Position('C', numbers)) == false) {
                         makeMove(figure, newPosition);
                         makeMove(board.get('A').get(numbers-1).getOccupiedFigure(), new Position('D', numbers));
-                        canChastle = true;
+                        isChastle = true;
                     }
                 }
             }
         }
 
-        return canChastle;
+        return isChastle;
     }
 
-    //TODO: Add special moves (Onpusont, Transformation of the pawn at the last rank)
+    public boolean isEnPassant(Figure figure, Position newPosition){
+        boolean isEnPassant = false;
+
+        if(figure.getType().equalsIgnoreCase("Pawn")){
+            if(figure.isWhite() && figure.getPosition().getNumber() == 5){
+                if(newPosition.getLetter() == figure.getPosition().getLetterBefor() && newPosition.getNumber() == figure.getPosition().getNumber()+1){
+                    if(figure.validatePosition(board, newPosition, figure.isWhite())){
+                        if(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().getType().equalsIgnoreCase("Pawn") && board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isBlack()){
+                            if(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isCanEnPassant()){
+                                capturedFigures.add(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                livingFiguresBlack.remove(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
+                                makeMove(figure, newPosition);
+                                isEnPassant = true;
+                            }
+                        }
+                    }
+                } else if (newPosition.getLetter() == figure.getPosition().getLetterAfter() && newPosition.getNumber() == figure.getPosition().getNumber()+1) {
+                    if(figure.validatePosition(board, newPosition, figure.isWhite())){
+                        if(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().getType().equalsIgnoreCase("Pawn") && board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isBlack()){
+                            if(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isCanEnPassant()){
+                                capturedFigures.add(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                livingFiguresBlack.remove(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
+                                makeMove(figure, newPosition);
+                                isEnPassant = true;
+                            }
+                        }
+                    }
+                }
+            } else if (figure.isBlack() && figure.getPosition().getNumber() == numbers-3) {
+                if(newPosition.getLetter() == figure.getPosition().getLetterBefor() && newPosition.getNumber() == figure.getPosition().getNumber()-1){
+                    if(figure.validatePosition(board, newPosition, figure.isWhite())){
+                        if(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().getType().equalsIgnoreCase("Pawn") && board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isWhite()){
+                            if(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isCanEnPassant()){
+                                capturedFigures.add(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                livingFiguresWhite.remove(board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                board.get(figure.getPosition().getLetterBefor()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
+                                makeMove(figure, newPosition);
+                                isEnPassant = true;
+                            }
+                        }
+                    }
+                } else if (newPosition.getLetter() == figure.getPosition().getLetterAfter() && newPosition.getNumber() == figure.getPosition().getNumber()-1) {
+                    if(figure.validatePosition(board, newPosition, figure.isWhite())){
+                        if(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().getType().equalsIgnoreCase("Pawn") && board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isWhite()){
+                            if(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure().isCanEnPassant()){
+                                capturedFigures.add(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                livingFiguresWhite.remove(board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).getOccupiedFigure());
+                                board.get(figure.getPosition().getLetterAfter()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
+                                makeMove(figure, newPosition);
+                                isEnPassant = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return isEnPassant;
+    }
+
+    public boolean isPawnPromotion(Figure figure, Position newPosition){
+        boolean isPawnPromotion = false;
+        char newType;
+        boolean isValidType = false;
+
+        if(figure.getType().equalsIgnoreCase("Pawn")){
+            if(figure.isWhite() && newPosition.getNumber() == numbers){
+                do {
+                    System.out.println("Enter the type you want to promote to. [K ... Knight, B ... Bishop, R ... Rook, Q ... Queen]");
+                    newType = System.console().readLine().charAt(0);
+                    for (int i = 0; i < figureTypes.length; i++) {
+                        if (newType == figureTypes[i]) isValidType = true;
+                    }
+                }while(isValidType == false);
+                pawnPromotion(figure, newPosition, newType);
+                isPawnPromotion = true;
+            } else if (figure.isBlack() && newPosition.getNumber() == 1) {
+                do {
+                    System.out.println("Enter the type you want to promote to. [K ... Knight, B ... Bishop, R ... Rook, Q ... Queen]");
+                    newType = System.console().readLine().charAt(0);
+                    for (int i = 0; i < figureTypes.length; i++) {
+                        if (newType == figureTypes[i]) isValidType = true;
+                    }
+                }while (isValidType == false);
+                pawnPromotion(figure, newPosition, newType);
+                isPawnPromotion = true;
+            }
+        }
+
+        return isPawnPromotion;
+    }
+
+    public void pawnPromotion(Figure figure, Position newPosition, char newTypeChar){
+        String newType;
+        Figure newFigure = null;
+        if(newTypeChar == 'K') newFigure = new Knight(figure.isWhite(), figure.isBlack(), figure.getPosition());
+        if(newTypeChar == 'B') newFigure = new Bishop(figure.isWhite(), figure.isBlack(), figure.getPosition());
+        if(newTypeChar == 'R') newFigure = new Rook(figure.isWhite(), figure.isBlack(), figure.getPosition());
+        if(newTypeChar == 'Q') newFigure = new Queen(figure.isWhite(), figure.isBlack(), figure.getPosition());
+        makeMove(newFigure, newPosition);
+    }
+
+    //TODO: Add canEnPassant variable Set to the class board. Is to be set to true, if a pawn makes the first move and goes 2 squares forward and is set to false, if enpassant isn't played at the very next move.
 }
