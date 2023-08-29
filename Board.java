@@ -47,6 +47,8 @@ public class Board {
 
     public Board(){
         createNewChessboard();
+        isCheckmate = false;
+        isPatt = false;
     }
 
     public Map<Character, List<Square>> createNewChessboard(){
@@ -165,20 +167,18 @@ public class Board {
     }
 
     public void makeMove(Figure figure, Position newPosition){
-        if(validateMove(figure,newPosition) == true){
-            if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure() != null){
-                capturedFigures.add(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
-                if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isWhite() == true){
-                    livingFiguresWhite.remove(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
-                }else{
-                    livingFiguresBlack.remove(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
-                }
+        if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure() != null){
+            capturedFigures.add(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
+            if(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure().isWhite() == true){
+                livingFiguresWhite.remove(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
+            }else{
+                livingFiguresBlack.remove(board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).getOccupiedFigure());
             }
-            board.get(figure.getPosition().getLetter()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
-            figure.setPosition(newPosition);
-            figure.setHadMoved(true);
-            board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).setOccupiedFigure(figure);
         }
+        board.get(figure.getPosition().getLetter()).get(figure.getPosition().getNumber()-1).setOccupiedFigure(null);
+        figure.setPosition(newPosition);
+        figure.setHadMoved(true);
+        board.get(newPosition.getLetter()).get(newPosition.getNumber()-1).setOccupiedFigure(figure);
     }
 
     public boolean validateMove(Figure figure, Position newPosition){
@@ -187,6 +187,9 @@ public class Board {
         Map<Character, List<Square>> boardAfterMove = board;
         Position kingsPosition;
         Figure figureAfterMove = figure;
+
+        //TODO: Add spezial moves
+        if(isChastle(figure, newPosition)) return true;
 
         if(figure.getType().equalsIgnoreCase("King")) {
             kingsPosition = figure.getPosition();
@@ -201,7 +204,7 @@ public class Board {
             if(pawnCanSee(figure).contains(newPosition)) figureCanSeePosition = true;
         }else {
             if(figure.canMoveTo(board).contains(newPosition)) figureCanSeePosition = true;
-        } //TODO: Add spezial moves
+        }
         if(figureCanSeePosition = false) isValid = false;
 
         if(isValid == true){
@@ -219,6 +222,7 @@ public class Board {
             if(isCheck(boardAfterMove, figure.isWhite(), kingsPosition)) isValid = false;
         }
 
+        if(isValid == true) makeMove(figure, newPosition);
         return isValid;
     }
 
@@ -302,5 +306,47 @@ public class Board {
         return isPatt;
     }
 
-    //TODO: Add special moves (Onpusont, Chastle, Transformation of the pawn at the last rank)
+    public boolean isChastle(Figure figure, Position newPosition){
+        boolean canChastle = false;
+
+        if(figure.getType().equalsIgnoreCase("King") && figure.isHadMoved() == false){
+            if(figure.isWhite() && newPosition.getNumber() == 1 && newPosition.getLetter() == 'G' && board.get(letters.charAt(letters.length()-1)).get(0).getOccupiedFigure().isHadMoved() == false){
+                if(board.get('F').get(0).getOccupiedFigure() == null && board.get('G').get(0).getOccupiedFigure() == null) {
+                    if (isCheck(board, true, figure.getPosition()) == false && isCheck(board, true, new Position('F', 1)) == false && isCheck(board, true, new Position('G', 1)) == false) {
+                        makeMove(figure, newPosition);
+                        makeMove(board.get('H').get(0).getOccupiedFigure(), new Position('F', 1));
+                        canChastle = true;
+                    }
+                }
+            } else if (figure.isWhite() && newPosition.getNumber() == 1 && newPosition.getLetter() == 'C' && board.get('A').get(0).getOccupiedFigure().isHadMoved() == false) {
+                if(board.get('B').get(0).getOccupiedFigure() == null && board.get('C').get(0).getOccupiedFigure() == null && board.get('D').get(0).getOccupiedFigure() == null) {
+                    if (isCheck(board, true, figure.getPosition()) == false && isCheck(board, true, new Position('D', 1)) == false && isCheck(board, true, new Position('C', 1)) == false) {
+                        makeMove(figure, newPosition);
+                        makeMove(board.get('A').get(0).getOccupiedFigure(), new Position('D', 1));
+                        canChastle = true;
+                    }
+                }
+            } else if (figure.isBlack() && newPosition.getNumber() == numbers && newPosition.getLetter() == 'G' && board.get(letters.charAt(letters.length()-1)).get(numbers-1).getOccupiedFigure().isHadMoved() == false) {
+                if(board.get('F').get(numbers-1).getOccupiedFigure() == null && board.get('G').get(numbers-1).getOccupiedFigure() == null) {
+                    if (isCheck(board, false, figure.getPosition()) == false && isCheck(board, false, new Position('F', numbers)) == false && isCheck(board, false, new Position('G', numbers)) == false) {
+                        makeMove(figure, newPosition);
+                        makeMove(board.get('H').get(numbers-1).getOccupiedFigure(), new Position('F', numbers));
+                        canChastle = true;
+                    }
+                }
+            } else if (figure.isBlack() && newPosition.getNumber() == numbers && newPosition.getLetter() == 'C' && board.get('A').get(numbers-1).getOccupiedFigure().isHadMoved() == false) {
+                if(board.get('B').get(numbers-1).getOccupiedFigure() == null && board.get('C').get(numbers-1).getOccupiedFigure() == null && board.get('D').get(numbers-1).getOccupiedFigure() == null) {
+                    if (isCheck(board, false, figure.getPosition()) == false && isCheck(board, false, new Position('D', numbers)) == false && isCheck(board, false, new Position('C', numbers)) == false) {
+                        makeMove(figure, newPosition);
+                        makeMove(board.get('A').get(numbers-1).getOccupiedFigure(), new Position('D', numbers));
+                        canChastle = true;
+                    }
+                }
+            }
+        }
+
+        return canChastle;
+    }
+
+    //TODO: Add special moves (Onpusont, Transformation of the pawn at the last rank)
 }
